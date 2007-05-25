@@ -20,7 +20,7 @@ HOMEPATH = "http://#{RUBYFORGE_PROJECT}.rubyforge.org"
 
 
 NAME = "recaptcha"
-REV = (`hg tip`.split(/:/)[1]).strip
+REV = nil
 VERS = ENV['VERSION'] || (Recaptcha::VERSION::STRING + (REV ? ".#{REV}" : ""))
 CLEAN.include ['**/.*.sw?', '*.gem', '.config', '**/.DS_Store']
 RDOC_OPTS = ['--quiet', '--title', 'recaptcha documentation',
@@ -48,6 +48,7 @@ hoe = Hoe.new(GEM_NAME, VERS) do |p|
   p.clean_globs = CLEAN  #An array of file patterns to delete on clean.
   
   # == Optional
+  `hg history lib/recaptcha.rb>History.txt` 
   p.changes = p.paragraphs_of("History.txt", 0..1).join("\n\n")
   #p.extra_deps = []     # An array of rubygem dependencies [name, version], e.g. [ ['active_support', '>= 1.3.1'] ]
   #p.spec_extras = {}    # A hash of extra values to set in the gemspec.
@@ -64,12 +65,8 @@ end
 desc 'Upload website files to lonsoft'
 task :website_upload do
   sh 'scp -r website/* loonsoft.com:loonsoft_docroot/recaptcha'
-  sh 'scp pkg/*.gem  loonsoft.com:loonsoft_docroot/recaptcha/pkg/'
-end
-desc "create history"
-task :create_history do
-  puts `hg history lib/recaptcha.rb>History.txt` 
+  sh 'scp pkg/*.gem  loonsoft.com:loonsoft_docroot/recaptcha/pkg/gems'
 end
 
 desc 'Generate and upload website files'
-task :website => [:website_generate, :create_history, :package, :website_upload]
+task :website => [:website_generate, :package, :website_upload]
