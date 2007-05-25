@@ -66,6 +66,7 @@ desc 'Upload website files to lonsoft'
 task :website_upload do
   sh 'scp -r website/* loonsoft.com:loonsoft_docroot/recaptcha'
   sh 'scp pkg/*.gem  loonsoft.com:loonsoft_docroot/recaptcha/pkg/gems'
+  sh "ssh loonsoft.com 'cd loonsoft_docroot/recaptcha && index_gem_repository.rb -d pkg'"
 end
 
 desc 'Generate and upload website files'
