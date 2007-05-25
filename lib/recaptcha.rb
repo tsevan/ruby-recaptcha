@@ -1,5 +1,3 @@
-#Here is the license template:
-#
 #Copyright (c) 2007, McClain Looney
 #
 #All rights reserved.
