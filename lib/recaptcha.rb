@@ -42,7 +42,7 @@ module ReCaptcha
   end
   class Client
 
-    def initialize(pubkey, privkey, ssl=true)
+    def initialize(pubkey, privkey, ssl=false)
       @pubkey = pubkey
       @privkey=privkey
       @host = ssl ? 'api-secure.recaptcha.net':'api.recaptcha.net'
