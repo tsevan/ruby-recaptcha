@@ -17,9 +17,15 @@ The ReCaptchaClient abstracts the ReCaptcha API for use in Rails Applications
 
 h2. Demonstration of usage
 
-First, create an account at ReCaptcha.net.
+First, create an account at "ReCaptcha.net":http://www.recaptcha.net.
 
-Then, require the gem into your application.rb, and <code>include ReCaptcha::AppHelper</code>. This will mix in validate_recap to your application controller.
+Then, require and include the gem into your application.rb, 
+<pre>
+gem 'recaptcha'
+class ApplicationController < ActionController::Base
+  include ReCaptcha::AppHelper
+</pre>
+ This will mix in validate_recap to your application controller.
 
 
 Then, in your concrete controller, chain validate_recap into your validation:
@@ -30,9 +36,11 @@ Then, in your concrete controller, chain validate_recap into your validation:
              ...do stuff...
 </pre>
 
-In your application_helper, <code>include ReCaptcha::ViewHelper</code>. This will mix in get_captcha().
+Include the view helper in your application_helper: 
+<pre>include ReCaptcha::ViewHelper</pre> 
+This will mix in get_captcha().
 
-Now you can just call <code>get_captcha()</code> in your view to insert the requisite widget from ReCaptcha
+Now you can just call <pre>get_captcha()</pre> in your view to insert the requisite widget from ReCaptcha
 
 h2. Forum
 
@@ -40,7 +48,7 @@ h2. Forum
 
 h2. License
 
-This code is free to use under the terms of the BSD licence. 
+This code is free to use under the terms of the new BSD licence. 
 
 h2. Contact
 
