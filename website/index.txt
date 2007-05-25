@@ -11,6 +11,7 @@ h2. Installing
 <pre syntax="ruby">sudo gem install recaptcha</pre>
 
 h2. The basics
+
 The ReCaptchaClient abstracts the ReCaptcha API for use in Rails Applications
 
 
@@ -37,7 +38,7 @@ h2. Forum
 
 "http://groups.google.com/group/recaptcha":http://groups.google.com/group/recaptcha
 
-h2. Licence
+h2. License
 
 This code is free to use under the terms of the BSD licence. 
 

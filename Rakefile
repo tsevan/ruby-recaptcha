@@ -68,4 +68,4 @@ task :website_upload do
 end
 
 desc 'Generate and upload website files'
-task :website => [:package, :website_generate, :website_upload]
+task :website => [:website_generate, :package, :website_upload]
