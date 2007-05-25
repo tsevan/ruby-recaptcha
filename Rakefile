@@ -20,7 +20,7 @@ HOMEPATH = "http://#{RUBYFORGE_PROJECT}.rubyforge.org"
 
 
 NAME = "recaptcha"
-REV = 1
+REV = (`hg tip`.split(/:/)[1]).strip
 VERS = ENV['VERSION'] || (Recaptcha::VERSION::STRING + (REV ? ".#{REV}" : ""))
 CLEAN.include ['**/.*.sw?', '*.gem', '.config', '**/.DS_Store']
 RDOC_OPTS = ['--quiet', '--title', 'recaptcha documentation',
@@ -66,6 +66,10 @@ task :website_upload do
   sh 'scp -r website/* loonsoft.com:loonsoft_docroot/recaptcha'
   sh 'scp pkg/*.gem  loonsoft.com:loonsoft_docroot/recaptcha/pkg/'
 end
+desc "create history"
+task :create_history do
+  puts `hg history lib/recaptcha.rb>History.txt` 
+end
 
 desc 'Generate and upload website files'
-task :website => [:website_generate, :package, :website_upload]
+task :website => [:website_generate, :create_history, :package, :website_upload]
