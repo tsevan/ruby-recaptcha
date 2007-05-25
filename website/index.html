@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <link rel="stylesheet" href="stylesheets/screen.css" type="text/css" media="screen" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+      recaptcha
+  </title>
+  <script src="javascripts/rounded_corners_lite.inc.js" type="text/javascript"></script>
+<style>
+
+</style>
+  <script type="text/javascript">
+    window.onload = function() {
+      settings = {
+          tl: { radius: 10 },
+          tr: { radius: 10 },
+          bl: { radius: 10 },
+          br: { radius: 10 },
+          antiAlias: true,
+          autoPad: true,
+          validTags: ["div"]
+      }
+      var versionBox = new curvyCorners(settings, document.getElementById("version"));
+      versionBox.applyCornersToAll();
+    }
+  </script>
+</head>
+<body>
+<div id="main">
+
+    <h1>recaptcha</h1>
+    <div id="version" class="clickable" onclick='document.location = "http://rubyforge.org/projects/recaptcha"; return false'>
+      Get Version
+      <a href="http://rubyforge.org/projects/recaptcha" class="numbers">0.0.1</a>
+    </div>
+    <h1>&#x2192; &#8216;recaptcha&#8217;</h1>
+
+
+	<h2>What</h2>
+
+
+	<h2>Installing</h2>
+
+
+<pre syntax="ruby">sudo gem install recaptcha</pre>
+
+	<h2>The basics
+The ReCaptchaClient abstracts the ReCaptcha <span class="caps">API</span> for use in Rails Applications</h2>
+
+
+	<h2>Demonstration of usage</h2>
+
+
+	<p>First, create an account at ReCaptcha.net.</p>
+
+
+	<p>Then, require the gem into your application.rb</p>
+
+
+	<p>You&#8217;ll probably want a help method like this in application.rb</p>
+
+
+<pre>
+  private 
+
+    def validate_recap(p, errors) 
+        rcc=ReCaptchaClient.new(RCC_PUB, RCC_PRIV)
+        res = rcc.validate(request.remote_ip, p[:recaptcha_challenge_field], p[:recaptcha_response_field], errors)
+         session[:rcc_err]=rcc.last_error
+         res
+    end
+</pre>
+
+	<p>The parameters to the ReCaptchaClient are your public and private ReCaptcha keys.</p>
+
+
+Then, in your object controller, chain validate_recap into your validation:
+<pre>
+  def create
+      @user = User.new(params[:user])
+      if validate_recap(params, @user.errors) &#38;&#38; @user.save
+             ...do stuff...
+</pre>
+
+In your application_helper, you probably want something like this:
+<pre>
+
+    def get_captcha()
+        k = ReCaptchaClient.new(RCC_PUB, RCC_PRIV)
+        k.get_challenge(session[:rcc_err] || '' )
+    end
+</pre>
+
+	<p>Now you can just call <code>get_captcha()</code> in your view to insert the requisite widget from ReCaptcha</p>
+
+
+	<h2>Forum</h2>
+
+
+	<p><a href="http://groups.google.com/group/recaptcha">http://groups.google.com/group/recaptcha</a></p>
+
+
+	<h2>Licence</h2>
+
+
+	<p>This code is free to use under the terms of the <span class="caps">BSD</span> licence.</p>
+
+
+	<h2>Contact</h2>
+
+
+	<p>Comments are welcome. Send an email to <a href="mailto:mlooney@gmail.com">McClain Looney</a>.</p>
+    <p class="coda">
+      <a href="mailto:drnicwilliams@gmail.com">Dr Nic</a>, 25th May 2007<br>
+      Theme extended from <a href="http://rb2js.rubyforge.org/">Paul Battley</a>
+    </p>
+</div>
+
+<!-- insert site tracking codes here, like Google Urchin -->
+
+</body>
+</html>
