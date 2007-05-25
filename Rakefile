@@ -61,15 +61,11 @@ task :website_generate do
   end
 end
 
-desc 'Upload website files to rubyforge'
+desc 'Upload website files to lonsoft'
 task :website_upload do
-  config = YAML.load(File.read(File.expand_path("~/.rubyforge/user-config.yml")))
-  host = "#{config["username"]}@rubyforge.org"
-  remote_dir = "/var/www/gforge-projects/#{RUBYFORGE_PROJECT}/"
-  # remote_dir = "/var/www/gforge-projects/#{RUBYFORGE_PROJECT}/#{GEM_NAME}"
-  local_dir = 'website'
-  sh %{rsync -av #{local_dir}/ #{host}:#{remote_dir}}
+  `scp -r website/* loonsoft.com:loonsoft_docroot/recaptcha`
+  `scp pkg/*.gem  loonsoft.com:loonsoft_docroot/recaptcha/`
 end
 
 desc 'Generate and upload website files'
-task :website => [:website_generate, :website_upload]
+task :website => [:package, :website_generate, :website_upload]
