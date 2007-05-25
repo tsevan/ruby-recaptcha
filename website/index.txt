@@ -48,7 +48,7 @@ h2. Forum
 
 h2. License
 
-This code is free to use under the terms of the new BSD licence. 
+This code is free to use under the terms of the MIT License.
 
 h2. Contact
 
