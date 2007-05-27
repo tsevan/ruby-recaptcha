@@ -1,10 +1,28 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
+require 'rubygems'
+gem 'rails'
 
 class TestRecaptcha < Test::Unit::TestCase
+  class ViewFixture
+    PRIVKEY='6LdnAQAAAAAAAPYLVPwVvR7Cy9YLhRQcM3NWsK_C'
+    PUBKEY='6LdnAQAAAAAAAKEk59yjuP3csGEeDmdj__7cyMtY'
+    include ReCaptcha::ViewHelper
+  end
 
   def setup
+    @vf = ViewFixture.new
+
   end
-  
+
+  def test_encrypt
+    mhc = ReCaptcha::MHClient.new('01S1TOX9aibKxfC9oJlp8IeA==', 'deadbeefdeadbeefdeadbeefdeadbeef')
+    z =mhc.encrypt('x@example.com')
+    assert_equal 'wBG7nOgntKqWeDpF9ucVNQ==', z
+    z =mhc.encrypt('johndoe@example.com')
+    assert_equal 'whWIqk0r4urZ-3S7y7uSceC9_ECd3hpAGy71E2o0HpI=', z
+
+  end
+
   def test_constructor
     client = ReCaptcha::Client.new('abc', 'def', true)
     expected= <<-EOF

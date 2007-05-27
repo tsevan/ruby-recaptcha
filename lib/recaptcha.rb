@@ -17,6 +17,8 @@
 #LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
+require 'openssl'
+require 'base64'
 require 'cgi'
 require 'net/http'
 require 'net/https'
@@ -28,6 +30,17 @@ module ReCaptcha
       session[:rcc_err]=''
       r
     end
+    def mail_hide(address, contents=nil)
+      contents = truncate(address,10) if contents.nil?
+      k = ReCaptcha::MHClient.new(MH_PUB, MH_PRIV)
+      enciphered = k.encrypt(address)
+      uri = "http://mailhide.recaptcha.net/d?k=#{MH_PUB}&c=#{enciphered}"
+      t =<<-EOF
+      <a href="#{uri}"
+      onclick="window.open('#{uri}', '', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=300'); return false;" title="Reveal this e-mail address">#{contents}</a>
+    EOF
+    end
+
   end
   module  AppHelper
     private
@@ -37,6 +50,34 @@ module ReCaptcha
       session[:rcc_err]=rcc.last_error
 
       res
+    end
+  end
+  class MHClient
+    def initialize(pubkey, privkey)
+      @pubkey=pubkey
+      @privkey=privkey
+      @host='mailhide.recaptcha.net'
+    end
+    def encrypt(string)
+      padded = pad(string)
+      iv="\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00\00"
+      cipher=OpenSSL::Cipher::Cipher.new("AES-128-CBC")
+      binkey = @privkey.unpack('a2'*16).map{|x| x.hex}.pack('c'*16)
+      cipher.encrypt
+      cipher.key=binkey
+      cipher.iv=iv
+      ciphertext = []
+      cipher.padding=0
+      ciphertext = cipher.update(padded)
+      ciphertext << cipher.final() rescue nil 
+      Base64.encode64(ciphertext).strip.gsub(/\+/, '-').gsub(/\//, '_')
+    end
+    def pad(str)
+      l= 16-(str.length%16)
+      l.times do
+        str<< l
+      end
+      str
     end
   end
   class Client
@@ -84,5 +125,9 @@ module ReCaptcha
       errors.add_to_base(msg) if  result != 'true'
       result == 'true' 
     end
+  end
+
+  private
+  def mk_request
   end
 end
