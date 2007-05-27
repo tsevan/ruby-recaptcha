@@ -127,7 +127,4 @@ module ReCaptcha
     end
   end
 
-  private
-  def mk_request
-  end
 end
