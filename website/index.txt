@@ -49,6 +49,7 @@ This will mix in get_captcha().
 Now you can just call <pre>get_captcha()</pre> in your view to insert the requisite widget from ReCaptcha
 
 h3. Mail Hide
+
 When you mix in ViewHelper as above, you also get <pre> mail_hide(address, contents)</pre>, which you can call in your view thusly:
 
 <pre>
