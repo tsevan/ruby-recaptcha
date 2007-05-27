@@ -21,6 +21,8 @@ The ReCaptchaClient abstracts the ReCaptcha API for use in Rails Applications
 
 h2. Demonstration of usage
 
+h3. reCAPTCHA
+
 First, create an account at "ReCaptcha.net":http://www.recaptcha.net.
 
 Then, require and include the gem into your application.rb, 
@@ -45,6 +47,16 @@ Include the view helper in your application_helper:
 This will mix in get_captcha().
 
 Now you can just call <pre>get_captcha()</pre> in your view to insert the requisite widget from ReCaptcha
+
+h3. Mail Hide
+When you mix in ViewHelper as above, you also get <pre> mail_hide(address, contents)</pre>, which you can call in your view thusly:
+
+<pre>
+  ...
+  <%= mail_hide(user.email) %>
+</pre>
+
+Contents defaults to the first few characters of the email address.
 
 h2. Forum
 
