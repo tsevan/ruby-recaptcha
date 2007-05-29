@@ -46,9 +46,6 @@ class TestRecaptcha < Test::Unit::TestCase
     #the validate process works right.
     #due to the nature of captcha,really validating would be quite a bit of work.
     client = ReCaptcha::Client.new('abc', 'def')
-    assert client.validate('0.0.0.0', 'abc', 'def'){|result|
-      raise "unexpected" if result != 'true'
-    }
-      
+    assert client.validate('0.0.0.0', 'abc', 'def', nil)
   end
 end

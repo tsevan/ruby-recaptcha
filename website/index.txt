@@ -38,14 +38,9 @@ Then, in your concrete controller, chain validate_recap into your validation:
 <pre>
   def create
       @user = User.new(params[:user])
-      if validate_recap(params, @user.errors){|result| @user.errors.add_to_base("error message") if result == 'true'} && @user.save
+      if validate_recap(params, @user.errors) && @user.save
              ...do stuff...
 </pre>
-
-
-Note that you can set your own custom validation message by passing a block to validate_recap. The block will be passed the result of the call to the reCaptcha service (either 'true' or 'false').
-
-
 
 Include the view helper in your application_helper: 
 <pre>include ReCaptcha::ViewHelper</pre> 

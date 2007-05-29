@@ -44,9 +44,9 @@ module ReCaptcha
   end
   module  AppHelper
     private
-    def validate_recap(p, &block)
+    def validate_recap(p, errors)
       rcc=ReCaptcha::Client.new(RCC_PUB, RCC_PRIV)
-      res = rcc.validate(request.remote_ip, p[:recaptcha_challenge_field], p[:recaptcha_response_field], &block)
+      res = rcc.validate(request.remote_ip, p[:recaptcha_challenge_field], p[:recaptcha_response_field], errors)
       session[:rcc_err]=rcc.last_error
 
       res
@@ -108,10 +108,11 @@ module ReCaptcha
     def last_error
       @last_error
     end
-    def validate(remoteip, challenge, response, &block)
+    def validate(remoteip, challenge, response, errors)
+      msg = "Captcha failed."
       return true if remoteip == '0.0.0.0'
       if not response
-        yield 'false'
+        errors.add_to_base(msg)
         return false
       end
       http = Net::HTTP.new(@vhost, 80)
@@ -121,7 +122,7 @@ module ReCaptcha
       response = data.split
       result = response[0].chomp
       @last_error=response[1].chomp
-      yield result
+      errors.add_to_base(msg) if  result != 'true'
       result == 'true' 
     end
   end
