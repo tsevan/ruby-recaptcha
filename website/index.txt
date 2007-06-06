@@ -25,6 +25,10 @@ h3. reCAPTCHA
 
 First, create an account at "ReCaptcha.net":http://www.recaptcha.net.
 
+Get your keys, and make them available as constants in your application. You can do this however you want, but RCC_PUB, RCC_PRIV (for regular reCaptcha) and MH_PUB MH_PRIV (for MailHide) must be set to their respective values (the keys you receive from reCaptcha).
+
+The two common methods of doing this (for Rails applications) are to set these variables in your environment.rb file, or via an environment variable.
+
 Then, require and include the gem into your application.rb, 
 <pre>
 gem 'recaptcha'
