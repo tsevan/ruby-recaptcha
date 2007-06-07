@@ -24,9 +24,9 @@ require 'net/http'
 require 'net/https'
 module ReCaptcha
   module ViewHelper
-    def get_captcha()
+    def get_captcha(options={})
       k = ReCaptcha::Client.new(RCC_PUB, RCC_PRIV)
-      r = k.get_challenge(session[:rcc_err] || '' )
+      r = k.get_challenge(session[:rcc_err] || '', options)
       session[:rcc_err]=''
       r
     end
@@ -91,8 +91,18 @@ module ReCaptcha
       @ssl = ssl
     end
 
-    def get_challenge(error='')
-      s=<<-EOF
+    def get_challenge(error='', options={})
+      s=''
+      if options[:options]
+        s<<"<script type=\"text/javascript\">\nvar RecaptchaOptions = { "
+        options[:options].each do |k,v|
+          val = (v.class == Fixnum) ? "#{v}" : "\"#{v}\""
+          s << "#{k} : #{val}, "
+        end
+        s.sub!(/, $/, '};')
+        s<<"\n</script>\n"
+      end
+      s<<<<-EOF
       <script type="text/javascript" src="#{@proto}://#{@host}/challenge?k=#{CGI.escape(@pubkey)}&error=#{CGI.escape(error)}"> </script>
       <noscript>
       <iframe src="#{@proto}://#{@host}/noscript?k=#{CGI.escape(@pubkey)}"
