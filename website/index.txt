@@ -31,7 +31,7 @@ The two common methods of doing this (for Rails applications) are to set these v
 
 Then, require and include the gem into your application.rb, 
 <pre>
-gem 'recaptcha'
+require 'recaptcha'
 class ApplicationController < ActionController::Base
   include ReCaptcha::AppHelper
 </pre>
