@@ -29,9 +29,9 @@ Get your keys, and make them available as constants in your application. You can
 
 The two common methods of doing this (for Rails applications) are to set these variables in your environment.rb file, or via an environment variable.
 
-Then, require and include the gem into your application.rb, 
+Then, require and include the gem into your application.rb, NOTE: gem is used here, not require
 <pre>
-require 'recaptcha'
+gem 'recaptcha'
 class ApplicationController < ActionController::Base
   include ReCaptcha::AppHelper
 </pre>
@@ -46,8 +46,10 @@ Then, in your concrete controller, chain validate_recap into your validation:
              ...do stuff...
 </pre>
 
-Include the view helper in your application_helper: 
-<pre>include ReCaptcha::ViewHelper</pre> 
+Require and include the view helper in your application_helper: NOTE: require is used here, not gem, not sure why.
+<pre>
+  require 'recaptcha'
+  include ReCaptcha::ViewHelper</pre> 
 This will mix in get_captcha().
 
 Now you can just call <pre>get_captcha()</pre> in your view to insert the requisite widget from ReCaptcha
