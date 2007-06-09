@@ -24,17 +24,17 @@ class TestRecaptcha < Test::Unit::TestCase
   def test_constructor
     client = new_client('abc', 'def', true)
     expected= <<-EOF
-    <script type=\"text/javascript\" src=\"https://api-secure.recaptcha.net/challenge?k=abc&error=\"> </script>\n      <noscript>\n      <iframe src=\"https://api-secure.recaptcha.net/noscript?k=abc\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
+    <script type=\"text/javascript\" src=\"https://api-secure.recaptcha.net/challenge?k=abc\"> </script>\n      <noscript>\n      <iframe src=\"https://api-secure.recaptcha.net/noscript?k=abc\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
     EOF
     assert_equal expected.strip, client.get_challenge.strip
     client = new_client
     expected= <<-EOF
-    <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=abc&error=\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=abc\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
+    <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=abc\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=abc\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
     EOF
     assert_equal expected.strip, client.get_challenge.strip
     client = new_client
     expected= <<-EOF
-    <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=abc&error=\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=abc\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
+    <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=abc\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=abc\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
     EOF
     assert_equal expected.strip, client.get_challenge.strip
   end
@@ -43,9 +43,9 @@ class TestRecaptcha < Test::Unit::TestCase
     # "Look and Feel Customization" per http://recaptcha.net/apidocs/captcha/
     client = new_client
     expected= <<-EOF
-    <script type=\"text/javascript\">\nvar RecaptchaOptions = { tabindex : 10, theme : \"white\"};\n</script>\n      <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=abc&error=\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=abc\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
+    <script type=\"text/javascript\">\nvar RecaptchaOptions = { theme : \"white\", tabindex : 10};\n</script>\n      <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=abc&error=somerror\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=abc&error=somerror\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
     EOF
-    assert_equal expected.strip, client.get_challenge('', :options => {:theme => 'white', :tabindex => 10}).strip
+    assert_equal expected.strip, client.get_challenge('somerror', :options => {:theme => 'white', :tabindex => 10}).strip
   end
 
   def test_validate

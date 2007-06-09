@@ -94,18 +94,19 @@ module ReCaptcha
     def get_challenge(error='', options={})
       s=''
       if options[:options]
-        s<<"<script type=\"text/javascript\">\nvar RecaptchaOptions = { "
+        s << "<script type=\"text/javascript\">\nvar RecaptchaOptions = { "
         options[:options].each do |k,v|
           val = (v.class == Fixnum) ? "#{v}" : "\"#{v}\""
           s << "#{k} : #{val}, "
         end
         s.sub!(/, $/, '};')
-        s<<"\n</script>\n"
+        s << "\n</script>\n"
       end
-      s<<<<-EOF
-      <script type="text/javascript" src="#{@proto}://#{@host}/challenge?k=#{CGI.escape(@pubkey)}&error=#{CGI.escape(error)}"> </script>
+      errslug = (error.empty?||error==nil) ? '' :  "&error=#{CGI.escape(error)}"
+      s <<<<-EOF
+      <script type="text/javascript" src="#{@proto}://#{@host}/challenge?k=#{CGI.escape(@pubkey)}#{errslug}"> </script>
       <noscript>
-      <iframe src="#{@proto}://#{@host}/noscript?k=#{CGI.escape(@pubkey)}"
+      <iframe src="#{@proto}://#{@host}/noscript?k=#{CGI.escape(@pubkey)}#{errslug}"
       height="300" width="500" frameborder="0"></iframe><br>
       <textarea name="recaptcha_challenge_field" rows="3" cols="40">
       </textarea>
