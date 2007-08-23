@@ -102,7 +102,7 @@ module ReCaptcha
         s.sub!(/, $/, '};')
         s << "\n</script>\n"
       end
-      errslug = (error.empty?||error==nil) ? '' :  "&error=#{CGI.escape(error)}"
+      errslug = (error.empty?||error==nil||error=="success") ? '' :  "&error=#{CGI.escape(error)}"
       s <<<<-EOF
       <script type="text/javascript" src="#{@proto}://#{@host}/challenge?k=#{CGI.escape(@pubkey)}#{errslug}"> </script>
       <noscript>
