@@ -51,7 +51,7 @@ hoe = Hoe.new(GEM_NAME, VERS) do |p|
   `hg history lib/recaptcha.rb>History.txt` 
   p.changes = p.paragraphs_of("History.txt", 0..1).join("\n\n")
   #p.extra_deps = []     # An array of rubygem dependencies [name, version], e.g. [ ['active_support', '>= 1.3.1'] ]
-  #p.spec_extras = {}    # A hash of extra values to set in the gemspec.
+  p.spec_extras = {:platform=>'ruby'}    # A hash of extra values to set in the gemspec.
 end
 
 
@@ -63,10 +63,10 @@ task :website_generate do
 end
 
 desc 'Upload website files to lonsoft'
-task :website_upload do
+task :website_upload=>[:gem] do
   sh 'scp -r website/* loonsoft.com:loonsoft_docroot/recaptcha'
-  sh 'scp pkg/*.gem  loonsoft.com:loonsoft_docroot/recaptcha/pkg/gems'
-  sh "ssh loonsoft.com 'cd loonsoft_docroot/recaptcha && index_gem_repository.rb -d pkg'"
+  sh 'scp pkg/*.gem  loonsoft.com:loonsoft_docroot/recaptcha/pkg/gems/'
+  sh "ssh loonsoft.com 'cd loonsoft_docroot/recaptcha && gem generate_index -d pkg'"
 end
 
 desc 'Generate and upload website files'

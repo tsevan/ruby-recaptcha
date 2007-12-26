@@ -11,7 +11,7 @@ h2. Installing
 <pre syntax="ruby">sudo gem install recaptcha</pre>
 or 
 <pre>
-  gem install --source http://www.loonsoft.com/recaptcha/pkg recaptcha
+  gem install --source http://www.loonsoft.com/recaptcha/pkg/gem recaptcha
 </pre>
 
 h2. The basics
