@@ -7,7 +7,7 @@ require 'erb'
 require File.dirname(__FILE__) + '/../lib/recaptcha/version.rb'
 
 version  = Recaptcha::VERSION::STRING
-download = 'http://www.loonsoft.com/recaptcha/pkg/gems'
+download = "http://www.loonsoft.com/recaptcha/pkg/gems/recaptcha-#{version}.gem"
 
 class Fixnum
   def ordinal

@@ -8,11 +8,10 @@ h2. What
 
 h2. Installing
 
-<pre syntax="ruby">sudo gem install recaptcha</pre>
-or 
 <pre>
-  gem install --source http://www.loonsoft.com/recaptcha/pkg/gem recaptcha
+  gem install --source http://www.loonsoft.com/recaptcha/pkg/ recaptcha
 </pre>
+<em>Note: the trailing slash on the uri is significant.</em>
 
 h2. The basics
 
