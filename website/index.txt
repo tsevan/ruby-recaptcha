@@ -98,4 +98,5 @@ Comments are welcome. Send an email to "McClain Looney":mailto:mlooney@gmail.com
 Contributors:
 
 Victor Cosby (test cleanup, additional code to style widget)
+
 Ronald Schroeter (proxy support) suggestion & proto-patch
