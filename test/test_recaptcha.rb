@@ -1,5 +1,7 @@
 require File.dirname(__FILE__) + '/test_helper.rb'
 require 'rubygems'
+gem 'mocha'
+require 'mocha'
 gem 'rails'
 
 class TestRecaptcha < Test::Unit::TestCase
@@ -48,12 +50,49 @@ class TestRecaptcha < Test::Unit::TestCase
     assert_equal expected.strip, client.get_challenge('somerror', :options => {:theme => 'white', :tabindex => 10}).strip
   end
 
-  def test_validate
-    #bad test, this just validates that the logic to short-circuit
-    #the validate process works right.
-    #due to the nature of captcha,really validating would be quite a bit of work.
+  def test_validate_fails
+    badwords_resp="false\r\n360 incorrect-captcha-sol"
+    err_stub=mock()
+    err_stub.expects(:add_to_base).with("Captcha failed.")
+    stub_proxy=mock('proxy')
+    stub_http = mock('http mock')
+    stub_proxy.expects(:start).with('api-verify.recaptcha.net').returns(stub_http)
+    stub_http.expects(:post).with('/verify', 'privatekey=def&remoteip=localhost&challenge=abc&response=def', {'Content-Type' => 'application/x-www-form-urlencoded'}).returns(['foo', badwords_resp])
+    Net::HTTP.expects(:Proxy).returns(stub_proxy)
     client = new_client
-    assert client.validate('0.0.0.0', 'abc', 'def', nil)
+    assert !client.validate('localhost', 'abc', 'def', err_stub)
+  end
+  def test_validate_good
+    goodwords_resp="true\r\nsuccess"
+    err_stub=mock()
+    stub_proxy=mock('proxy')
+    stub_http = mock('http mock')
+    stub_proxy.expects(:start).with('api-verify.recaptcha.net').returns(stub_http)
+    stub_http.expects(:post).with('/verify', 'privatekey=def&remoteip=localhost&challenge=abc&response=def', {'Content-Type' => 'application/x-www-form-urlencoded'}).returns(['foo', goodwords_resp])
+    Net::HTTP.expects(:Proxy).with(nil, nil).returns(stub_proxy)
+    client = new_client
+    assert client.validate('localhost', 'abc', 'def', err_stub)
+  end
+  def test_validate_good_proxy
+    ENV['proxy_host']='fubar:8080'
+    goodwords_resp="true\r\nsuccess"
+    err_stub=mock()
+    stub_proxy=mock('proxy')
+    stub_http = mock('http mock')
+    stub_proxy.expects(:start).with('api-verify.recaptcha.net').returns(stub_http)
+    stub_http.expects(:post).with('/verify', 'privatekey=def&remoteip=localhost&challenge=abc&response=def', {'Content-Type' => 'application/x-www-form-urlencoded'}).returns(['foo', goodwords_resp])
+    Net::HTTP.expects(:Proxy).with('fubar', '8080').returns(stub_proxy)
+    client = new_client
+    assert client.validate('localhost', 'abc', 'def', err_stub)
+    ENV['proxy_host']='fubar'
+    err_stub=mock()
+    stub_proxy=mock('proxy')
+    stub_http = mock('http mock')
+    stub_proxy.expects(:start).with('api-verify.recaptcha.net').returns(stub_http)
+    stub_http.expects(:post).with('/verify', 'privatekey=def&remoteip=localhost&challenge=abc&response=def', {'Content-Type' => 'application/x-www-form-urlencoded'}).returns(['foo', goodwords_resp])
+    Net::HTTP.expects(:Proxy).with('fubar', nil).returns(stub_proxy)
+    client = new_client
+    assert client.validate('localhost', 'abc', 'def', err_stub)
   end
   
 private

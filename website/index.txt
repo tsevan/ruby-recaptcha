@@ -59,6 +59,13 @@ To customize theme and tabindex of the widget, you can include an options hash:
 
 See the "reCAPTCHA API Documentation":http://recaptcha.net/apidocs/captcha/ under "Look and Feel Customization" for more information.
 
+h3. Proxy support
+
+If your rails application requires the use of a proxy, set proxy_host into your environment:
+<pre>
+  ENV['proxy_host']='foo.example.com:8080'
+</pre>
+
 h3. Mail Hide
 
 When you mix in ViewHelper as above, you also get <pre> mail_hide(address, contents)</pre>, which you can call in your view thusly:
@@ -91,3 +98,4 @@ Comments are welcome. Send an email to "McClain Looney":mailto:mlooney@gmail.com
 Contributors:
 
 Victor Cosby (test cleanup, additional code to style widget)
+Ronald Schroeter (proxy support) suggestion & proto-patch
