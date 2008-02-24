@@ -25,7 +25,7 @@ require 'net/https'
 module ReCaptcha
   module ViewHelper
     def get_captcha(options={})
-      k = ReCaptcha::Client.new(RCC_PUB, RCC_PRIV)
+      k = ReCaptcha::Client.new(options[:rcc_pub] || RCC_PUB, options[:rcc_priv] || RCC_PRIV)
       r = k.get_challenge(session[:rcc_err] || '', options)
       session[:rcc_err]=''
       r
@@ -45,7 +45,7 @@ module ReCaptcha
   module  AppHelper
     private
     def validate_recap(p, errors)
-      rcc=ReCaptcha::Client.new(RCC_PUB, RCC_PRIV)
+      rcc=ReCaptcha::Client.new(options[:rcc_pub] || RCC_PUB, options[:rcc_priv] || RCC_PRIV)
       res = rcc.validate(request.remote_ip, p[:recaptcha_challenge_field], p[:recaptcha_response_field], errors)
       session[:rcc_err]=rcc.last_error
 

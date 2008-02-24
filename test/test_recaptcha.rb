@@ -4,11 +4,32 @@ gem 'mocha'
 require 'mocha'
 gem 'rails'
 
+module ReCaptcha
+  module ViewHelper
+    def self.define_public_key
+      class_eval "RCC_PUB = 'foo'"
+    end
+    def self.define_private_key
+      class_eval "RCC_PRIV = 'bar'"
+    end
+    def self.undefine_public_key
+      remove_const :RCC_PUB
+    end
+    def self.undefine_private_key
+      remove_const :RCC_PRIV
+    end
+  end
+end
+
 class TestRecaptcha < Test::Unit::TestCase
   class ViewFixture
     PRIVKEY='6LdnAQAAAAAAAPYLVPwVvR7Cy9YLhRQcM3NWsK_C'
     PUBKEY='6LdnAQAAAAAAAKEk59yjuP3csGEeDmdj__7cyMtY'
     include ReCaptcha::ViewHelper
+    # views in Rails "inherit" the controller's session...
+    def session
+      @session ||= {}
+    end
   end
 
   def setup
@@ -93,6 +114,68 @@ class TestRecaptcha < Test::Unit::TestCase
     Net::HTTP.expects(:Proxy).with('fubar', nil).returns(stub_proxy)
     client = new_client
     assert client.validate('localhost', 'abc', 'def', err_stub)
+  end
+  def test_get_captcha_fails_without_key_constants
+    assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PUB)
+    assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PRIV)
+    assert_raise NameError do
+      @vf.get_captcha
+    end
+  end
+  def test_get_captcha_fails_without_public_key_constant
+    assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PUB)
+    assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PRIV)
+    ReCaptcha::ViewHelper.define_private_key
+    assert ReCaptcha::ViewHelper.const_defined?(:RCC_PRIV)
+    assert_raise NameError do
+      @vf.get_captcha
+    end
+    ReCaptcha::ViewHelper.undefine_private_key
+  end
+  def test_get_captcha_fails_without_private_key_constant
+    assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PUB)
+    assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PRIV)
+    ReCaptcha::ViewHelper.define_public_key
+    assert ReCaptcha::ViewHelper.const_defined?(:RCC_PUB)
+    assert_raise NameError do
+      @vf.get_captcha
+    end
+    ReCaptcha::ViewHelper.undefine_public_key
+  end
+  def test_get_captcha_succeeds_with_key_constants
+    assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PUB)
+    assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PRIV)
+    ReCaptcha::ViewHelper.define_public_key
+    ReCaptcha::ViewHelper.define_private_key
+    assert ReCaptcha::ViewHelper.const_defined?(:RCC_PUB)
+    assert ReCaptcha::ViewHelper.const_defined?(:RCC_PRIV)
+    assert_nothing_raised do
+      @vf.get_captcha
+    end
+    ReCaptcha::ViewHelper.undefine_public_key
+    ReCaptcha::ViewHelper.undefine_private_key
+  end
+  def test_get_captcha_succeeds_without_key_constants_but_with_options
+    assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PUB)
+    assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PRIV)
+    assert_nothing_raised do
+      @vf.get_captcha(:rcc_pub => 'foo', :rcc_priv => 'bar')
+    end
+  end
+  def test_get_captcha_is_correct_with_constants_and_with_options
+    expected= <<-EOF
+    <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=%s\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=%s\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
+    EOF
+    # first, with constants
+    ReCaptcha::ViewHelper.define_public_key  # 'foo'
+    ReCaptcha::ViewHelper.define_private_key # 'bar'
+    actual = @vf.get_captcha
+    assert_equal (((expected % ['foo', 'foo']).strip), actual.strip)
+    ReCaptcha::ViewHelper.undefine_public_key
+    ReCaptcha::ViewHelper.undefine_private_key
+    # next, with options
+    actual = @vf.get_captcha(:rcc_pub => 'foobar', :rcc_priv => 'blegga')
+    assert_equal(((expected % ['foobar', 'foobar']).strip), actual.strip)
   end
   
 private

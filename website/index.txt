@@ -28,7 +28,12 @@ Get your keys, and make them available as constants in your application. You can
 
 The two common methods of doing this (for Rails applications) are to set these variables in your environment.rb file, or via an environment variable.
 
-Then, require and include the gem into your application.rb, NOTE: gem is used here, not require
+The ReCaptchaClient initializer can also take an options hash containing keys thusly:
+<pre>
+  Recaptcha.new(:rcc_pub=>'some key', :rcc_priv=>'some other key')
+</pre>
+
+After your keys are configured, require and include the gem into your application.rb, NOTE: gem is used here, not require
 <pre>
 gem 'recaptcha'
 class ApplicationController < ActionController::Base
@@ -100,3 +105,5 @@ Contributors:
 Victor Cosby (test cleanup, additional code to style widget)
 <br>
 Ronald Schroeter (proxy support suggestion & proto-patch)
+<br>
+Peter Vandenberk (multi-key support)
