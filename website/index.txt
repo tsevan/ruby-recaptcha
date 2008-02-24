@@ -30,7 +30,7 @@ The two common methods of doing this (for Rails applications) are to set these v
 
 The ReCaptchaClient initializer can also take an options hash containing keys thusly:
 <pre>
-  Recaptcha.new(:rcc_pub=>'some key', :rcc_priv=>'some other key')
+  RecaptchaClient.new(:rcc_pub=>'some key', :rcc_priv=>'some other key')
 </pre>
 
 After your keys are configured, require and include the gem into your application.rb, NOTE: gem is used here, not require

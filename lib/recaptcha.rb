@@ -44,7 +44,7 @@ module ReCaptcha
   end
   module  AppHelper
     private
-    def validate_recap(p, errors)
+    def validate_recap(p, errors, options = {})
       rcc=ReCaptcha::Client.new(options[:rcc_pub] || RCC_PUB, options[:rcc_priv] || RCC_PRIV)
       res = rcc.validate(request.remote_ip, p[:recaptcha_challenge_field], p[:recaptcha_response_field], errors)
       session[:rcc_err]=rcc.last_error
