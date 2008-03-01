@@ -19,6 +19,21 @@ module ReCaptcha
       remove_const :RCC_PRIV
     end
   end
+  module AppHelper
+    def self.define_public_key
+      class_eval "RCC_PUB = 'foo'"
+    end
+    def self.define_private_key
+      class_eval "RCC_PRIV = 'bar'"
+    end
+    def self.undefine_public_key
+      remove_const :RCC_PUB
+    end
+    def self.undefine_private_key
+      remove_const :RCC_PRIV
+    end
+    public :validate_recap
+  end
 end
 
 class TestRecaptcha < Test::Unit::TestCase
@@ -31,9 +46,23 @@ class TestRecaptcha < Test::Unit::TestCase
       @session ||= {}
     end
   end
+  class ControllerFixture
+    include ReCaptcha::AppHelper
+    # all Rails controllers have a session...
+    def session
+      @session ||= {}
+    end
+    include Mocha::Standalone
+    def request
+      request = mock()
+      request.stubs(:remote_ip).returns('0.0.0.0') # this will skip the actual captcha validation...
+      request
+    end
+  end
 
   def setup
     @vf = ViewFixture.new
+    @cf = ControllerFixture.new
   end
 
   def test_encrypt
@@ -115,6 +144,11 @@ class TestRecaptcha < Test::Unit::TestCase
     client = new_client
     assert client.validate('localhost', 'abc', 'def', err_stub)
   end
+  
+  #
+  # unit tests for the get_captcha() ViewHelper method
+  #
+  
   def test_get_captcha_fails_without_key_constants
     assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PUB)
     assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PRIV)
@@ -170,11 +204,99 @@ class TestRecaptcha < Test::Unit::TestCase
     ReCaptcha::ViewHelper.define_public_key  # 'foo'
     ReCaptcha::ViewHelper.define_private_key # 'bar'
     actual = @vf.get_captcha
-    assert_equal (((expected % ['foo', 'foo']).strip), actual.strip)
+    assert_equal(((expected % ['foo', 'foo']).strip), actual.strip)
     ReCaptcha::ViewHelper.undefine_public_key
     ReCaptcha::ViewHelper.undefine_private_key
     # next, with options
     actual = @vf.get_captcha(:rcc_pub => 'foobar', :rcc_priv => 'blegga')
+    assert_equal(((expected % ['foobar', 'foobar']).strip), actual.strip)
+  end
+  
+  #
+  # unit tests for the validate_recap() AppHelper method
+  #
+  
+  def test_validate_recap_fails_without_key_constants
+    assert !ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
+    assert !ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
+    assert_raise NameError do
+      @cf.validate_recap({}, {})
+    end
+  end
+  def test_validate_recap_fails_without_public_key_constant
+    assert !ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
+    assert !ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
+    ReCaptcha::AppHelper.define_private_key
+    assert ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
+    assert_raise NameError do
+      @cf.validate_recap({}, {})
+    end
+    ReCaptcha::AppHelper.undefine_private_key
+  end
+  def test_validate_recap_fails_without_private_key_constant
+    assert !ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
+    assert !ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
+    ReCaptcha::AppHelper.define_public_key
+    assert ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
+    assert_raise NameError do
+      @cf.validate_recap({}, {})
+    end
+    ReCaptcha::AppHelper.undefine_public_key
+  end
+  def test_validate_recap_succeeds_with_key_constants
+    assert !ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
+    assert !ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
+    ReCaptcha::AppHelper.define_public_key
+    ReCaptcha::AppHelper.define_private_key
+    assert ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
+    assert ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
+    assert_nothing_raised do
+      @cf.validate_recap({}, {})
+    end
+    ReCaptcha::AppHelper.undefine_public_key
+    ReCaptcha::AppHelper.undefine_private_key
+  end
+  def test_validate_recap_succeeds_without_key_constants_but_with_options
+    assert !ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
+    assert !ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
+    assert_nothing_raised do
+      @cf.validate_recap({}, {}, :rcc_pub => 'foo', :rcc_priv => 'bar')
+    end
+  end
+  def test_validate_recap_is_correct_with_constants_and_with_options
+    # first, with constants
+    ReCaptcha::AppHelper.define_public_key  # 'foo'
+    ReCaptcha::AppHelper.define_private_key # 'bar'
+    assert @cf.validate_recap({}, {})
+    ReCaptcha::AppHelper.undefine_public_key
+    ReCaptcha::AppHelper.undefine_private_key
+    # next, with options
+    assert @cf.validate_recap({}, {}, :rcc_pub => 'foobar', :rcc_priv => 'blegga')
+  end
+  
+  #
+  # unit tests for HTTP/HTTPS-variants of get_captcha() method
+  #
+  
+  def test_get_captcha_uses_http_without_options
+    expected= <<-EOF
+    <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=%s\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=%s\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
+    EOF
+    actual = @vf.get_captcha(:rcc_pub => 'foobar', :rcc_priv => 'blegga')
+    assert_equal(((expected % ['foobar', 'foobar']).strip), actual.strip)
+  end
+  def test_get_captcha_uses_https_with_options_true
+    expected= <<-EOF
+    <script type=\"text/javascript\" src=\"https://api-secure.recaptcha.net/challenge?k=%s\"> </script>\n      <noscript>\n      <iframe src=\"https://api-secure.recaptcha.net/noscript?k=%s\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
+    EOF
+    actual = @vf.get_captcha(:rcc_pub => 'foobar', :rcc_priv => 'blegga', :ssl => true)
+    assert_equal(((expected % ['foobar', 'foobar']).strip), actual.strip)
+  end
+  def test_get_captcha_uses_http_with_options_false
+    expected= <<-EOF
+    <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=%s\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=%s\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
+    EOF
+    actual = @vf.get_captcha(:rcc_pub => 'foobar', :rcc_priv => 'blegga', :ssl => false)
     assert_equal(((expected % ['foobar', 'foobar']).strip), actual.strip)
   end
   

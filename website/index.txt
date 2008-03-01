@@ -106,4 +106,4 @@ Victor Cosby (test cleanup, additional code to style widget)
 <br>
 Ronald Schroeter (proxy support suggestion & proto-patch)
 <br>
-Peter Vandenberk (multi-key support)
+Peter Vandenberk (multi-key support, ssl support, various unit tests, test refactoring)

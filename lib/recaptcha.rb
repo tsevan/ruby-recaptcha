@@ -25,7 +25,7 @@ require 'net/https'
 module ReCaptcha
   module ViewHelper
     def get_captcha(options={})
-      k = ReCaptcha::Client.new(options[:rcc_pub] || RCC_PUB, options[:rcc_priv] || RCC_PRIV)
+      k = ReCaptcha::Client.new(options[:rcc_pub] || RCC_PUB, options[:rcc_priv] || RCC_PRIV, options[:ssl] || false)
       r = k.get_challenge(session[:rcc_err] || '', options)
       session[:rcc_err]=''
       r
@@ -89,6 +89,7 @@ module ReCaptcha
       @vhost = 'api-verify.recaptcha.net'
       @proto = ssl ? 'https' : 'http'
       @ssl = ssl
+      @last_error=nil
     end
 
     def get_challenge(error='', options={})
