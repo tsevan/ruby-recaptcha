@@ -73,6 +73,13 @@ class TestRecaptcha < Test::Unit::TestCase
     assert_equal 'whWIqk0r4urZ-3S7y7uSceC9_ECd3hpAGy71E2o0HpI=', z
   end
 
+  def test_nil_challenge
+    client = new_client
+    estub = stub_everything('errors')
+    client.validate('abc', nil, 'foo', estub)
+
+  end
+
   def test_constructor
     client = new_client('abc', 'def', true)
     expected= <<-EOF
