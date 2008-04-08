@@ -107,3 +107,5 @@ Victor Cosby (test cleanup, additional code to style widget)
 Ronald Schroeter (proxy support suggestion & proto-patch)
 <br>
 Peter Vandenberk (multi-key support, ssl support, various unit tests, test refactoring)
+<br>
+Kim Griggs (found long address-newline bug)  

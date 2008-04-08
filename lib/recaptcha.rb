@@ -70,7 +70,7 @@ module ReCaptcha
       cipher.padding=0
       ciphertext = cipher.update(padded)
       ciphertext << cipher.final() rescue nil 
-      Base64.encode64(ciphertext).strip.gsub(/\+/, '-').gsub(/\//, '_')
+      Base64.encode64(ciphertext).strip.gsub(/\+/, '-').gsub(/\//, '_').gsub(/\n/,'')
     end
     def pad(str)
       l= 16-(str.length%16)

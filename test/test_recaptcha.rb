@@ -72,6 +72,13 @@ class TestRecaptcha < Test::Unit::TestCase
     z =mhc.encrypt('johndoe@example.com')
     assert_equal 'whWIqk0r4urZ-3S7y7uSceC9_ECd3hpAGy71E2o0HpI=', z
   end
+  def test_encrypt_long
+    mhc = ReCaptcha::MHClient.new('01S1TOX9aibKxfC9oJlp8IeA==', 'deadbeefdeadbeefdeadbeefdeadbeef')
+    z =mhc.encrypt('averylongemailaddressofmorethan32cdharactersx@example.com')
+    assert_equal "q-0LLVT2bIxWbFpfLfpNhJAGadkfWXVk4hAxSlVaLrdnXrsB1NKNubavS5N-7PBued3K531vifN6NB3iz3W7qQ==",z
+    z =mhc.encrypt('johndoe@example.com')
+    assert_equal 'whWIqk0r4urZ-3S7y7uSceC9_ECd3hpAGy71E2o0HpI=', z
+  end
 
   def test_nil_challenge
     client = new_client
