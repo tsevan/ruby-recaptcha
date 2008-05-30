@@ -1,4 +1,4 @@
-#Copyright (c) 2007 McClain Looney
+#Copyright (c) 2007, 2008 McClain Looney
 #
 #Permission is hereby granted, free of charge, to any person obtaining a copy
 #of this software and associated documentation files (the "Software"), to deal
@@ -122,7 +122,7 @@ module ReCaptcha
     end
     def validate(remoteip, challenge, response, errors)
       msg = "Captcha failed."
-      return true if remoteip == '0.0.0.0'
+      return true if  %w(0.0.0.0 127.0.0.1).include?(remoteip)
       unless response and challenge
         errors.add_to_base(msg)
         return false
