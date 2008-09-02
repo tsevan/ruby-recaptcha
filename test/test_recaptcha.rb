@@ -48,16 +48,17 @@ class TestRecaptcha < Test::Unit::TestCase
   end
   class ControllerFixture
     include ReCaptcha::AppHelper
+    attr_reader :request
     # all Rails controllers have a session...
     def session
       @session ||= {}
     end
-    include Mocha::Standalone
-    def request
-      request = mock()
-      request.stubs(:remote_ip).returns('0.0.0.0') # this will skip the actual captcha validation...
-      request
+    def initialize()
+      @request = mock()
+      @request.stubs(:remote_ip).returns('0.0.0.0') # this will skip the actual captcha validation...
+      @request
     end
+    include Mocha::Standalone
   end
 
   def setup
@@ -104,7 +105,7 @@ class TestRecaptcha < Test::Unit::TestCase
     EOF
     assert_equal expected.strip, client.get_challenge.strip
   end
-  
+
   def test_constructor_with_recaptcha_options
     # "Look and Feel Customization" per http://recaptcha.net/apidocs/captcha/
     client = new_client
@@ -158,11 +159,11 @@ class TestRecaptcha < Test::Unit::TestCase
     client = new_client
     assert client.validate('localhost', 'abc', 'def', err_stub)
   end
-  
+
   #
   # unit tests for the get_captcha() ViewHelper method
   #
-  
+
   def test_get_captcha_fails_without_key_constants
     assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PUB)
     assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PRIV)
@@ -191,6 +192,9 @@ class TestRecaptcha < Test::Unit::TestCase
     ReCaptcha::ViewHelper.undefine_public_key
   end
   def test_get_captcha_succeeds_with_key_constants
+    mock_client = mock('client')
+    ReCaptcha::Client.expects(:new).returns(mock_client)
+    mock_client.expects(:get_challenge).with('', {})
     assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PUB)
     assert !ReCaptcha::ViewHelper.const_defined?(:RCC_PRIV)
     ReCaptcha::ViewHelper.define_public_key
@@ -225,11 +229,11 @@ class TestRecaptcha < Test::Unit::TestCase
     actual = @vf.get_captcha(:rcc_pub => 'foobar', :rcc_priv => 'blegga')
     assert_equal(((expected % ['foobar', 'foobar']).strip), actual.strip)
   end
-  
+
   #
   # unit tests for the validate_recap() AppHelper method
   #
-  
+
   def test_validate_recap_fails_without_key_constants
     assert !ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
     assert !ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
@@ -258,6 +262,8 @@ class TestRecaptcha < Test::Unit::TestCase
     ReCaptcha::AppHelper.undefine_public_key
   end
   def test_validate_recap_succeeds_with_key_constants
+    e = mock('errors')
+    e.expects(:add_to_base).with('Captcha failed.')
     assert !ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
     assert !ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
     ReCaptcha::AppHelper.define_public_key
@@ -265,33 +271,41 @@ class TestRecaptcha < Test::Unit::TestCase
     assert ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
     assert ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
     assert_nothing_raised do
-      @cf.validate_recap({}, {})
+      @cf.validate_recap({}, e)
     end
     ReCaptcha::AppHelper.undefine_public_key
     ReCaptcha::AppHelper.undefine_private_key
   end
   def test_validate_recap_succeeds_without_key_constants_but_with_options
+    mock = mock('client')
+    ReCaptcha::Client.expects(:new).returns(mock)
+    mock.expects(:validate).with('0.0.0.0', nil, nil, {}).returns(true)
+    mock.expects(:last_error)
     assert !ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
     assert !ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)
-    assert_nothing_raised do
-      @cf.validate_recap({}, {}, :rcc_pub => 'foo', :rcc_priv => 'bar')
-    end
+    @cf.validate_recap({}, {}, :rcc_pub => 'foo', :rcc_priv => 'bar')
   end
   def test_validate_recap_is_correct_with_constants_and_with_options
     # first, with constants
+    e = mock('errors')
+    mock = mock('client')
+    ReCaptcha::Client.expects(:new).returns(mock).times(2)
+    mock.expects(:validate).with('0.0.0.0', nil,  nil, {}).returns(true)
+    mock.expects(:last_error).times(2)
     ReCaptcha::AppHelper.define_public_key  # 'foo'
     ReCaptcha::AppHelper.define_private_key # 'bar'
     assert @cf.validate_recap({}, {})
     ReCaptcha::AppHelper.undefine_public_key
     ReCaptcha::AppHelper.undefine_private_key
     # next, with options
-    assert @cf.validate_recap({}, {}, :rcc_pub => 'foobar', :rcc_priv => 'blegga')
+    mock.expects(:validate).with('0.0.0.0', nil,  nil, e).returns(true)
+    assert @cf.validate_recap({}, e, {:rcc_pub => 'foobar', :rcc_priv => 'blegga'})
   end
-  
+
   #
   # unit tests for HTTP/HTTPS-variants of get_captcha() method
   #
-  
+
   def test_get_captcha_uses_http_without_options
     expected= <<-EOF
     <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=%s\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=%s\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
@@ -313,8 +327,8 @@ class TestRecaptcha < Test::Unit::TestCase
     actual = @vf.get_captcha(:rcc_pub => 'foobar', :rcc_priv => 'blegga', :ssl => false)
     assert_equal(((expected % ['foobar', 'foobar']).strip), actual.strip)
   end
-  
-private
+
+  private
 
   def new_client(pubkey='abc', privkey='def', ssl=false)
     ReCaptcha::Client.new(pubkey, privkey, ssl)

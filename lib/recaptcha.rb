@@ -122,7 +122,6 @@ module ReCaptcha
     end
     def validate(remoteip, challenge, response, errors)
       msg = "Captcha failed."
-      return true if  %w(0.0.0.0 127.0.0.1).include?(remoteip)
       unless response and challenge
         errors.add_to_base(msg)
         return false
