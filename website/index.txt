@@ -88,7 +88,7 @@ h2. Forum
 
 h2. Code
 
-Get it "here":http://hg.loonsoft.com/hg/recaptcha.master
+Get it "here":http://hg.loonsoft.com/recaptcha.master
 
 You'll want "Mercurial":http://www.selenic.com/mercurial
 
