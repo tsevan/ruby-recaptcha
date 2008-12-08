@@ -1,8 +1,5 @@
 h1. recaptcha
 
-h1. &#x2192; 'recaptcha'
-
-
 h2. What
 
 
