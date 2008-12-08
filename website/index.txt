@@ -85,7 +85,9 @@ h2. Forum
 
 h2. Code
 
-Get it "here":http://hg.loonsoft.com/recaptcha.master
+Get it "here":http://www.bitbucket.org/mml/ruby-recaptcha
+
+There's a wiki and issue tracker there if you need something fixed, or have a question.
 
 You'll want "Mercurial":http://www.selenic.com/mercurial
 
