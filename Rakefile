@@ -1,73 +1,27 @@
-require 'rubygems'
-require 'rake'
-require 'rake/clean'
-require 'rake/testtask'
-require 'rake/packagetask'
-require 'rake/gempackagetask'
-require 'rake/rdoctask'
-require 'rake/contrib/rubyforgepublisher'
-require 'fileutils'
-require 'hoe'
-include FileUtils
-require File.join(File.dirname(__FILE__), 'lib', 'recaptcha', 'version')
-
-AUTHOR = 'McClain Looney'  # can also be an array of Authors
-EMAIL = "m@loonsoft.com"
-DESCRIPTION = "description of gem"
-GEM_NAME = 'recaptcha' # what ppl will type to install your gem
-RUBYFORGE_PROJECT = 'recaptcha' # The unix name for your project
-HOMEPATH = "http://#{RUBYFORGE_PROJECT}.rubyforge.org"
-
-
-NAME = "recaptcha"
-REV = nil
-VERS = ENV['VERSION'] || (Recaptcha::VERSION::STRING + (REV ? ".#{REV}" : ""))
-CLEAN.include ['**/.*.sw?', '*.gem', '.config', '**/.DS_Store']
-RDOC_OPTS = ['--quiet', '--title', 'recaptcha documentation',
-    "--opname", "index.html",
-    "--line-numbers", 
-    "--main", "README",
-    "--inline-source"]
-
-class Hoe
-  def extra_deps 
-    @extra_deps.reject { |x| Array(x).first == 'hoe' } 
-  end 
-end
+%w[rubygems rake rake/clean fileutils newgem rubigen].each { |f| require f }
+require File.dirname(__FILE__) + '/lib/ruby-recaptcha'
 
 # Generate all the Rake tasks
 # Run 'rake -T' to see list of generated tasks (from gem root directory)
-hoe = Hoe.new(GEM_NAME, VERS) do |p|
-  p.author = AUTHOR 
-  p.description = DESCRIPTION
-  p.email = EMAIL
-  p.summary = DESCRIPTION
-  p.url = HOMEPATH
-  p.rubyforge_name = RUBYFORGE_PROJECT if RUBYFORGE_PROJECT
-  p.test_globs = ["test/**/test_*.rb"]
-  p.clean_globs = CLEAN  #An array of file patterns to delete on clean.
+$hoe = Hoe.new('ruby-recaptcha', RubyRecaptcha::VERSION) do |p|
+  p.developer('McClain Looney', 'm@loonsoft.com')
+  p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
+  p.rubyforge_name       = p.name # TODO this is default value
+  # p.extra_deps         = [
+  #   ['activesupport','>= 2.0.2'],
+  # ]
+  p.extra_dev_deps = [
+    ['newgem', ">= #{::Newgem::VERSION}"]
+  ]
   
-  # == Optional
-  `hg history lib/recaptcha.rb>History.txt` 
-  p.changes = p.paragraphs_of("History.txt", 0..1).join("\n\n")
-  #p.extra_deps = []     # An array of rubygem dependencies [name, version], e.g. [ ['active_support', '>= 1.3.1'] ]
-  p.spec_extras = {:platform=>'ruby'}    # A hash of extra values to set in the gemspec.
+  p.clean_globs |= %w[**/.DS_Store tmp *.log **/*.orig **/*~ **/*.swp]
+  path = (p.rubyforge_name == p.name) ? p.rubyforge_name : "\#{p.rubyforge_name}/\#{p.name}"
+  p.remote_rdoc_dir = File.join(path.gsub(/^#{p.rubyforge_name}\/?/,''), 'rdoc')
+  p.rsync_args = '-av --delete --ignore-errors'
 end
 
+require 'newgem/tasks' # load /tasks/*.rake
+Dir['tasks/**/*.rake'].each { |t| load t }
 
-desc 'Generate website files'
-task :website_generate do
-  Dir['website/**/*.txt'].each do |txt|
-    sh %{ ruby scripts/txt2html #{txt} > #{txt.gsub(/txt$/,'html')} }
-  end
-end
-
-desc 'Upload website files to lonsoft'
-task :website_upload=>[:gem] do
-  sh 'scp -r website/* loonsoft.com:loonsoft_docroot/recaptcha'
-  sh 'scp pkg/*.gem  loonsoft.com:loonsoft_docroot/recaptcha/pkg/gems/'
-  sh "ssh loonsoft.com 'umask 0022 && cd loonsoft_docroot/recaptcha && gem generate_index -d pkg && find . -type f | xargs chmod 644 '"
-end
-
-desc 'Generate and upload website files'
-task :website => [:website_generate, :package, :website_upload]
+# TODO - want other tests/tasks run by default? Add them to the list
+# task :default => [:spec, :features]

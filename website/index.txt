@@ -2,7 +2,6 @@ h1. recaptcha
 
 h2. What
 
-<br/>
 h2. Installing
 
 <pre>

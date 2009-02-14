@@ -1,2 +1,3 @@
+require 'stringio'
 require 'test/unit'
-require File.dirname(__FILE__) + '/../lib/recaptcha'
+require File.dirname(__FILE__) + '/../lib/ruby-recaptcha'
