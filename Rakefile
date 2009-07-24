@@ -1,9 +1,10 @@
 %w[rubygems rake rake/clean fileutils newgem rubigen].each { |f| require f }
 require File.dirname(__FILE__) + '/lib/ruby-recaptcha'
+require 'hoe'
 
 # Generate all the Rake tasks
 # Run 'rake -T' to see list of generated tasks (from gem root directory)
-$hoe = Hoe.new('ruby-recaptcha', RubyRecaptcha::VERSION) do |p|
+$hoe = Hoe.spec('ruby-recaptcha') do |p|
   p.developer('McClain Looney', 'm@loonsoft.com')
   p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
   p.rubyforge_name       = p.name # TODO this is default value

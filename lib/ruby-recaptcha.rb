@@ -3,5 +3,5 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 require 'recaptcha'
 module RubyRecaptcha
-  VERSION = '1.0.0'
+  VERSION = '1.0.1'
 end

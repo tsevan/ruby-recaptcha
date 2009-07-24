@@ -109,10 +109,7 @@ class TestRecaptcha < Test::Unit::TestCase
   def test_constructor_with_recaptcha_options
     # "Look and Feel Customization" per http://recaptcha.net/apidocs/captcha/
     client = new_client
-    expected= <<-EOF
-    <script type=\"text/javascript\">\nvar RecaptchaOptions = { theme : \"white\", tabindex : 10};\n</script>\n      <script type=\"text/javascript\" src=\"http://api.recaptcha.net/challenge?k=abc&error=somerror\"> </script>\n      <noscript>\n      <iframe src=\"http://api.recaptcha.net/noscript?k=abc&error=somerror\"\n      height=\"300\" width=\"500\" frameborder=\"0\"></iframe><br>\n      <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\">\n      </textarea>\n      <input type=\"hidden\" name=\"recaptcha_response_field\" \n      value=\"manual_challenge\">\n      </noscript>
-    EOF
-    assert_equal expected.strip, client.get_challenge('somerror', :options => {:theme => 'white', :tabindex => 10}).strip
+    assert_match(/theme \: \"white\"/, client.get_challenge('somerror', :options => {:theme => 'white', :tabindex => 10}))
   end
 
   def test_validate_fails
@@ -222,12 +219,12 @@ class TestRecaptcha < Test::Unit::TestCase
     ReCaptcha::ViewHelper.define_public_key  # 'foo'
     ReCaptcha::ViewHelper.define_private_key # 'bar'
     actual = @vf.get_captcha
-    assert_equal(((expected % ['foo', 'foo']).strip), actual.strip)
+    assert_match(/k=foo/, actual)
     ReCaptcha::ViewHelper.undefine_public_key
     ReCaptcha::ViewHelper.undefine_private_key
     # next, with options
     actual = @vf.get_captcha(:rcc_pub => 'foobar', :rcc_priv => 'blegga')
-    assert_equal(((expected % ['foobar', 'foobar']).strip), actual.strip)
+    assert_match(/k=foobar/, actual)
   end
 
   #
