@@ -67,17 +67,16 @@ class TestRecaptcha < Test::Unit::TestCase
   end
 
   def test_encrypt
-    mhc = ReCaptcha::MHClient.new('01S1TOX9aibKxfC9oJlp8IeA==', 'deadbeefdeadbeefdeadbeefdeadbeef')
-    z =mhc.encrypt('x@example.com')
+    mhc = ReCaptcha::MHClient.new('01S1TOX9aibKxfC9oJlp8IeA==', 'deadbeefdeadbeefdeadbeefdeadbeef', 'x@example.com')
+    z =mhc.crypted_address
     assert_equal 'wBG7nOgntKqWeDpF9ucVNQ==', z
-    z =mhc.encrypt('johndoe@example.com')
-    assert_equal 'whWIqk0r4urZ-3S7y7uSceC9_ECd3hpAGy71E2o0HpI=', z
   end
   def test_encrypt_long
-    mhc = ReCaptcha::MHClient.new('01S1TOX9aibKxfC9oJlp8IeA==', 'deadbeefdeadbeefdeadbeefdeadbeef')
-    z =mhc.encrypt('averylongemailaddressofmorethan32cdharactersx@example.com')
+    mhc = ReCaptcha::MHClient.new('01S1TOX9aibKxfC9oJlp8IeA==', 'deadbeefdeadbeefdeadbeefdeadbeef', 'averylongemailaddressofmorethan32cdharactersx@example.com')
+    z =mhc.crypted_address
     assert_equal "q-0LLVT2bIxWbFpfLfpNhJAGadkfWXVk4hAxSlVaLrdnXrsB1NKNubavS5N-7PBued3K531vifN6NB3iz3W7qQ==",z
-    z =mhc.encrypt('johndoe@example.com')
+    mhc = ReCaptcha::MHClient.new('01S1TOX9aibKxfC9oJlp8IeA==', 'deadbeefdeadbeefdeadbeefdeadbeef', 'johndoe@example.com')
+    z = mhc.crypted_address
     assert_equal 'whWIqk0r4urZ-3S7y7uSceC9_ECd3hpAGy71E2o0HpI=', z
   end
 
@@ -238,6 +237,7 @@ class TestRecaptcha < Test::Unit::TestCase
       @cf.validate_recap({}, {})
     end
   end
+
   def test_validate_recap_fails_without_public_key_constant
     assert !ReCaptcha::AppHelper.const_defined?(:RCC_PUB)
     assert !ReCaptcha::AppHelper.const_defined?(:RCC_PRIV)

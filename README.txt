@@ -1,21 +1,21 @@
 = ruby-recaptcha
 
-h2. What
+* http://www.bitbucket.org/mml/ruby-recaptcha
 
-h2. Installing
+== Installing
 
 <pre>
   gem install recaptcha
 </pre>
 
-h2. The basics
+== The basics
 
 The ReCaptchaClient abstracts the ReCaptcha API for use in Rails Applications
 
 
-h2. Demonstration of usage
+== Demonstration of usage
 
-h3. reCAPTCHA
+=== reCAPTCHA
 
 First, create an account at "ReCaptcha.net":http://www.recaptcha.net.
 
@@ -64,14 +64,14 @@ To customize theme and tabindex of the widget, you can include an options hash:
 
 See the "reCAPTCHA API Documentation":http://recaptcha.net/apidocs/captcha/ under "Look and Feel Customization" for more information.
 
-h3. Proxy support
+=== Proxy support
 
 If your rails application requires the use of a proxy, set proxy_host into your environment:
 <pre>
   ENV['proxy_host']='foo.example.com:8080'
 </pre>
 
-h3. Mail Hide
+=== Mail Hide
 
 When you mix in ViewHelper as above, you also get <pre> mail_hide(address, contents)</pre>, which you can call in your view thusly:
 
@@ -82,11 +82,11 @@ When you mix in ViewHelper as above, you also get <pre> mail_hide(address, conte
 
 Contents defaults to the first few characters of the email address.
 
-h2. Bugs
+== Bugs
 
 http://www.bitbucket.org/mml/ruby-recaptcha/issues
 
-h2. Code
+== Code
 
 Get it "here":http://www.bitbucket.org/mml/ruby-recaptcha
 
@@ -94,15 +94,15 @@ Note the wiki & forum & such there...
 
 
 
-h2. License
+== License
 
 This code is free to use under the terms of the MIT License.
 
-h2. Contact
+== Contact
 
 Comments are welcome. Send an email to "McClain Looney":mailto:mlooney@gmail.com.
 
-h2. Contributors:
+== Contributors:
 
 Victor Cosby (test cleanup, additional code to style widget)
 <br>
