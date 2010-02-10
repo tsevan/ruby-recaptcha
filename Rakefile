@@ -1,28 +1,20 @@
-%w[rubygems rake rake/clean fileutils newgem rubigen].each { |f| require f }
 require File.dirname(__FILE__) + '/lib/ruby-recaptcha'
+require 'rubygems'
+require 'rake/clean'
 require 'hoe'
 
 # Generate all the Rake tasks
 # Run 'rake -T' to see list of generated tasks (from gem root directory)
-$hoe = Hoe.spec('ruby-recaptcha') do |p|
+Hoe.plugins.delete  :rubyforge
+Hoe.spec('ruby-recaptcha') do |p|
+  p.version=RubyRecaptcha::VERSION
   p.developer('McClain Looney', 'm@loonsoft.com')
-  p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
-  p.rubyforge_name       = p.name # TODO this is default value
-  # p.extra_deps         = [
-  #   ['activesupport','>= 2.0.2'],
-  # ]
+  p.changes              = `hg log --style changelog`
   p.extra_dev_deps = [
-    ['newgem', ">= #{::Newgem::VERSION}"]
+    ['hoe', ">= 2.5.0"]
   ]
-  
   p.clean_globs |= %w[**/.DS_Store tmp *.log **/*.orig **/*~ **/*.swp]
-  path = (p.rubyforge_name == p.name) ? p.rubyforge_name : "\#{p.rubyforge_name}/\#{p.name}"
-  p.remote_rdoc_dir = File.join(path.gsub(/^#{p.rubyforge_name}\/?/,''), 'rdoc')
-  p.rsync_args = '-av --delete --ignore-errors'
 end
 
-require 'newgem/tasks' # load /tasks/*.rake
 Dir['tasks/**/*.rake'].each { |t| load t }
 
-# TODO - want other tests/tasks run by default? Add them to the list
-# task :default => [:spec, :features]
