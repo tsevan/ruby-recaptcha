@@ -7,9 +7,10 @@ require 'hoe'
 # Run 'rake -T' to see list of generated tasks (from gem root directory)
 Hoe.plugins.delete  :rubyforge
 Hoe.spec('ruby-recaptcha') do |p|
+  description= "A ruby gem interface to help Rails applications use the ReCaptcha service."
+  summary= "gem install ruby-recaptcha"
   p.version=RubyRecaptcha::VERSION
   p.developer('McClain Looney', 'm@loonsoft.com')
-  p.changes              = `hg log --style changelog`
   p.extra_dev_deps = [
     ['hoe', ">= 2.5.0"]
   ]
