@@ -1,21 +1,10 @@
-require File.dirname(__FILE__) + '/lib/ruby-recaptcha'
-require 'rubygems'
-require 'rake/clean'
-require 'hoe'
+require 'jeweler'
 
-# Generate all the Rake tasks
-# Run 'rake -T' to see list of generated tasks (from gem root directory)
-Hoe.plugins.delete  :rubyforge
-Hoe.spec('ruby-recaptcha') do |p|
-  description= "A ruby gem interface to help Rails applications use the ReCaptcha service."
-  summary= "gem install ruby-recaptcha"
-  p.version=RubyRecaptcha::VERSION
-  p.developer('McClain Looney', 'm@loonsoft.com')
-  p.extra_dev_deps = [
-    ['hoe', ">= 2.5.0"]
-  ]
-  p.clean_globs |= %w[**/.DS_Store tmp *.log **/*.orig **/*~ **/*.swp]
+Jeweler::Tasks.new do |gem|
+  gem.name = "ruby-recaptcha"
+  gem.summary = %Q{My Fork of https://bitbucket.org/mml/ruby-recaptcha. A ruby gem interface to help Rails applications use the ReCaptcha service.}
+  gem.description = %Q{A ruby gem interface to help Rails applications use the ReCaptcha service.}
+  # gem.email = "m@loonsoft.com"
+  gem.homepage = "https://github.com/tsevan/ruby-recaptcha"
+  gem.authors = ["McClain Looney"]
 end
-
-Dir['tasks/**/*.rake'].each { |t| load t }
-
