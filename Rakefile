@@ -6,5 +6,5 @@ Jeweler::Tasks.new do |gem|
   gem.description = %Q{A ruby gem interface to help Rails applications use the ReCaptcha service.}
   # gem.email = "m@loonsoft.com"
   gem.homepage = "https://github.com/tsevan/ruby-recaptcha"
-  gem.authors = ["McClain Looney"]
+  gem.authors = ["McClain Looney", "Vitaly Tsevan"]
 end

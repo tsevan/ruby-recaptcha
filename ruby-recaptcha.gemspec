@@ -5,10 +5,10 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ruby-recaptcha}
-  s.version = "1.0.3"
+  s.version = "1.0.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["McClain Looney"]
+  s.authors = ["McClain Looney", "Vitaly Tsevan"]
   s.date = %q{2011-02-18}
   s.description = %q{A ruby gem interface to help Rails applications use the ReCaptcha service.}
   s.extra_rdoc_files = [
@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
     "VERSION",
     "lib/recaptcha.rb",
     "lib/ruby-recaptcha.rb",
+    "ruby-recaptcha.gemspec",
     "script/console",
     "script/destroy",
     "script/generate",
