@@ -176,7 +176,7 @@ module ReCaptcha
     def validate(remoteip, challenge, response, errors)
       msg = "Captcha failed."
       unless response and challenge
-        errors.add_to_base(msg)
+        errors.add(:base, msg)
         return false
       end
       proxy_host, proxy_port = nil, nil
@@ -188,7 +188,7 @@ module ReCaptcha
       response = data.split
       result = response[0].chomp
       @last_error=response[1].chomp
-      errors.add_to_base(msg) if  result != 'true'
+      errors.add(:base, msg) if  result != 'true'
       result == 'true' 
     end
   end
