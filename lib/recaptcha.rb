@@ -166,6 +166,7 @@ module ReCaptcha
       value="manual_challenge">
       </noscript>
       EOF
+      s.html_safe
     end
 
     # Validate request. Note that this function actually makes a network request.
