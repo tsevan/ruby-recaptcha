@@ -39,7 +39,7 @@ module ReCaptcha
     #       = get_captcha(:rcc_pub => 'foobar', :rcc_priv => 'blegga', :ssl => true)
     #
     def get_captcha(options={})
-      k = ReCaptcha::Client.new((options[:rcc_pub] || RCC_PUB), (options[:rcc_priv] || RCC_PRIV), (options[:ssl] || false))
+      k = ReCaptcha::Client.new((options[:rcc_pub] || ReCaptcha::Config.rcc_pub), (options[:rcc_priv] || ReCaptcha::Config.rcc_priv), (options[:ssl] || false))
       r = k.get_challenge(session[:rcc_err] || '', options)
       session[:rcc_err]=''
       r
@@ -74,9 +74,9 @@ module ReCaptcha
     # [errors] errors hash-like thing. Usually ActiveRecord::Base.errors
     # [options] Options hash. currently only uses :rcc_pub and :rcc_priv options for passing in ReCaptcha keys.
     def validate_recap(p, errors, options = {})
-      rcc=ReCaptcha::Client.new(options[:rcc_pub] || RCC_PUB, options[:rcc_priv] || RCC_PRIV)
+      rcc = ReCaptcha::Client.new(options[:rcc_pub] || ReCaptcha::Config.rcc_pub, options[:rcc_priv] || ReCaptcha::Config.rcc_priv)
       res = rcc.validate(request.remote_ip, p[:recaptcha_challenge_field], p[:recaptcha_response_field], errors)
-      session[:rcc_err]=rcc.last_error
+      session[:rcc_err] = rcc.last_error
       res
     end
   end
@@ -87,8 +87,8 @@ module ReCaptcha
     # [privkey] MailHide private key
     # [address] the address you want to hide.
     def initialize(pubkey, privkey, address)
-      @pubkey=pubkey
-      @privkey=privkey
+      @pubkey = pubkey
+      @privkey = privkey
       @address = address
       @host='mailhide.recaptcha.net'
     end
@@ -131,12 +131,12 @@ module ReCaptcha
     # [ssl?] use https for requests when set. defaults to false.
     def initialize(pubkey, privkey, ssl=false)
       @pubkey = pubkey
-      @privkey=privkey
+      @privkey = privkey
       @host = ssl ? 'api-secure.recaptcha.net':'api.recaptcha.net'
       @vhost = 'api-verify.recaptcha.net'
       @proto = ssl ? 'https' : 'http'
       @ssl = ssl
-      @last_error=nil
+      @last_error = nil
     end
 
     # get ReCaptcha challenge text, optionally setting the error message displayed on failure.
@@ -193,4 +193,17 @@ module ReCaptcha
     end
   end
 
+  module Config
+    class << self
+      attr_accessor :rcc_pub, :rcc_priv
+
+      def config(config_hash)
+        config_hash.each do |key, val|
+          send("#{key}=", val)
+        end
+      end
+    end
+  end
 end
+
+ReCaptcha::Config.config(YAML::load(File.open('config/ruby_recaptcha.yml'))[Rails.env])
