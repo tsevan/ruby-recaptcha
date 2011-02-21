@@ -77,7 +77,7 @@ module ReCaptcha
       rcc = ReCaptcha::Client.new(options[:rcc_pub] || ReCaptcha::Config.rcc_pub, options[:rcc_priv] || ReCaptcha::Config.rcc_priv)
       res = rcc.validate(request.remote_ip, p[:recaptcha_challenge_field], p[:recaptcha_response_field], errors)
       session[:rcc_err] = rcc.last_error
-      res
+      res.html_safe
     end
   end
 
