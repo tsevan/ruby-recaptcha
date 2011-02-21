@@ -53,9 +53,9 @@ module ReCaptcha
     #
     def mail_hide(address, contents=nil)
       contents = truncate(address,10) if contents.nil?
-      k = ReCaptcha::MHClient.new(MH_PUB, MH_PRIV, address)
+      k = ReCaptcha::MHClient.new(ReCaptcha::Config.mh_pub, ReCaptcha::Config.mh_priv, address)
       enciphered = k.crypted_address
-      uri = "http://mailhide.recaptcha.net/d?k=#{MH_PUB}&c=#{enciphered}"
+      uri = "http://mailhide.recaptcha.net/d?k=#{ReCaptcha::Config.mh_pub}&c=#{enciphered}"
       t =<<-EOF
       <a href="#{uri}"
       onclick="window.open('#{uri}', '', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=300'); return false;" title="Reveal this e-mail address">#{contents}</a>
@@ -196,7 +196,7 @@ module ReCaptcha
 
   module Config
     class << self
-      attr_accessor :rcc_pub, :rcc_priv
+      attr_accessor :rcc_pub, :rcc_priv, :mh_pub, :mh_priv
 
       def config(config_hash)
         config_hash.each do |key, val|

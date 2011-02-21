@@ -19,9 +19,21 @@ The ReCaptchaClient abstracts the ReCaptcha API for use in Rails Applications
 
 First, create an account at "ReCaptcha.net":http://www.recaptcha.net.
 
-Get your keys, and make them available as constants in your application. You can do this however you want, but RCC_PUB, RCC_PRIV (for regular reCaptcha) and MH_PUB MH_PRIV (for MailHide) must be set to their respective values (the keys you receive from reCaptcha).
-
-The two common methods of doing this (for Rails applications) are to set these variables in your environment.rb file, or via an environment variable, or in Rails 2.2+, in an initializer.
+Get your keys, and put them available to config/ruby_recaptcha.yml application.
+The example of file:
+<pre>
+development:
+  rcc_pub: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
+  rcc_priv: 8Kyu25sSAAAAALYulleR8VbAE3jrLy7567WHRVqi
+  mh_pub: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
+  mh_priv: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
+test:
+  rcc_pub: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
+  rcc_priv: 8Kyu25sSAAAAALYulleR8VbAE3jrLy7567WHRVqi
+  mh_pub: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
+  mh_priv: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
+</pre>
+Fields rcc_pub, rcc_priv (for regular reCaptcha) and mh_pub mh_priv (for MailHide) must be set to their respective values (the keys you receive from reCaptcha).
 
 The ReCaptcha::Client constructor can also take an options hash containing keys thusly:
 <pre>
