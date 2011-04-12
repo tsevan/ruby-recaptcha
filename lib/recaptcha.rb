@@ -132,7 +132,7 @@ module ReCaptcha
     def initialize(pubkey, privkey, ssl=false)
       @pubkey = pubkey
       @privkey = privkey
-      @host = ssl ? 'api-secure.recaptcha.net':'api.recaptcha.net'
+      @host = ssl ? 'www.google.com/recaptcha/api':'api.recaptcha.net'
       @vhost = 'api-verify.recaptcha.net'
       @proto = ssl ? 'https' : 'http'
       @ssl = ssl
