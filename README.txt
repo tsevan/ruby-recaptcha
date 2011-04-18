@@ -27,13 +27,16 @@ development:
   rcc_priv: 8Kyu25sSAAAAALYulleR8VbAE3jrLy7567WHRVqi
   mh_pub: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
   mh_priv: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
+  enabled: false
 test:
   rcc_pub: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
   rcc_priv: 8Kyu25sSAAAAALYulleR8VbAE3jrLy7567WHRVqi
   mh_pub: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
   mh_priv: 8Kyu25sSAAAAALYulleR8VbAE3dsW96QWEVko
+  enabled: true
 </pre>
 Fields rcc_pub, rcc_priv (for regular reCaptcha) and mh_pub mh_priv (for MailHide) must be set to their respective values (the keys you receive from reCaptcha).
+Also you must enable using recaptcha for some environments (default value is false).
 
 The ReCaptcha::Client constructor can also take an options hash containing keys thusly:
 <pre>

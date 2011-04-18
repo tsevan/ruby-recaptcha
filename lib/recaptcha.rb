@@ -39,10 +39,12 @@ module ReCaptcha
     #       = get_captcha(:rcc_pub => 'foobar', :rcc_priv => 'blegga', :ssl => true)
     #
     def get_captcha(options={})
-      k = ReCaptcha::Client.new((options[:rcc_pub] || ReCaptcha::Config.rcc_pub), (options[:rcc_priv] || ReCaptcha::Config.rcc_priv), (options[:ssl] || false))
-      r = k.get_challenge(session[:rcc_err] || '', options)
-      session[:rcc_err]=''
-      r
+      if ReCaptcha::Config.enabled
+        k = ReCaptcha::Client.new((options[:rcc_pub] || ReCaptcha::Config.rcc_pub), (options[:rcc_priv] || ReCaptcha::Config.rcc_priv), (options[:ssl] || false))
+        r = k.get_challenge(session[:rcc_err] || '', options)
+        session[:rcc_err]=''
+        r
+      end
     end
 
     # Call this to generate the MailHide view code.
@@ -52,14 +54,16 @@ module ReCaptcha
     # [contents] optional string to display as the text of the mailhide link 
     #
     def mail_hide(address, contents=nil)
-      contents = truncate(address,10) if contents.nil?
-      k = ReCaptcha::MHClient.new(ReCaptcha::Config.mh_pub, ReCaptcha::Config.mh_priv, address)
-      enciphered = k.crypted_address
-      uri = "http://mailhide.recaptcha.net/d?k=#{ReCaptcha::Config.mh_pub}&c=#{enciphered}"
-      t =<<-EOF
-      <a href="#{uri}"
-      onclick="window.open('#{uri}', '', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=300'); return false;" title="Reveal this e-mail address">#{contents}</a>
-    EOF
+      if ReCaptcha::Config.enabled
+        contents = truncate(address,10) if contents.nil?
+        k = ReCaptcha::MHClient.new(ReCaptcha::Config.mh_pub, ReCaptcha::Config.mh_priv, address)
+        enciphered = k.crypted_address
+        uri = "http://mailhide.recaptcha.net/d?k=#{ReCaptcha::Config.mh_pub}&c=#{enciphered}"
+        t =<<-EOF
+          <a href="#{uri}"
+          onclick="window.open('#{uri}', '', 'toolbar=0,scrollbars=0,location=0,statusbar=0,menubar=0,resizable=0,width=500,height=300'); return false;" title="Reveal this e-mail address">#{contents}</a>
+        EOF
+      end
     end
 
   end
@@ -74,10 +78,14 @@ module ReCaptcha
     # [errors] errors hash-like thing. Usually ActiveRecord::Base.errors
     # [options] Options hash. currently only uses :rcc_pub and :rcc_priv options for passing in ReCaptcha keys.
     def validate_recap(p, errors, options = {})
-      rcc = ReCaptcha::Client.new(options[:rcc_pub] || ReCaptcha::Config.rcc_pub, options[:rcc_priv] || ReCaptcha::Config.rcc_priv)
-      res = rcc.validate(request.remote_ip, p[:recaptcha_challenge_field], p[:recaptcha_response_field], errors)
-      session[:rcc_err] = rcc.last_error
-      res
+      if ReCaptcha::Config.enabled
+        rcc = ReCaptcha::Client.new(options[:rcc_pub] || ReCaptcha::Config.rcc_pub, options[:rcc_priv] || ReCaptcha::Config.rcc_priv)
+        res = rcc.validate(request.remote_ip, p[:recaptcha_challenge_field], p[:recaptcha_response_field], errors)
+        session[:rcc_err] = rcc.last_error
+        res
+      else
+        true
+      end
     end
   end
 
@@ -196,7 +204,7 @@ module ReCaptcha
 
   module Config
     class << self
-      attr_accessor :rcc_pub, :rcc_priv, :mh_pub, :mh_priv
+      attr_accessor :rcc_pub, :rcc_priv, :mh_pub, :mh_priv, :enabled
 
       def config(config_hash)
         config_hash.each do |key, val|
