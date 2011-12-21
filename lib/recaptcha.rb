@@ -51,7 +51,7 @@ module ReCaptcha
     #
     # Note: doesn't currently support ssl for some reason.
     # [address] the email address you want to hide
-    # [contents] optional string to display as the text of the mailhide link 
+    # [contents] optional string to display as the text of the mailhide link
     #
     def mail_hide(address, contents=nil)
       if ReCaptcha::Config.enabled
@@ -116,7 +116,7 @@ module ReCaptcha
       ciphertext = []
       cipher.padding=0
       ciphertext = cipher.update(padded)
-      ciphertext << cipher.final() rescue nil 
+      ciphertext << cipher.final() rescue nil
       Base64.encode64(ciphertext).strip.gsub(/\+/, '-').gsub(/\//, '_').gsub(/\n/,'')
     end
     def pad(str)
@@ -150,7 +150,7 @@ module ReCaptcha
     # get ReCaptcha challenge text, optionally setting the error message displayed on failure.
     # [error] error message to be displayed on error
     # [options] options hash. This is translated into a javascript hash and sent along to the ReCaptcha service as RecaptchaOptions
-    #   
+    #
     def get_challenge(error='', options={})
       s=''
       if options[:options]
@@ -170,7 +170,7 @@ module ReCaptcha
       height="300" width="500" frameborder="0"></iframe><br>
       <textarea name="recaptcha_challenge_field" rows="3" cols="40">
       </textarea>
-      <input type="hidden" name="recaptcha_response_field" 
+      <input type="hidden" name="recaptcha_response_field"
       value="manual_challenge">
       </noscript>
       EOF
@@ -193,12 +193,13 @@ module ReCaptcha
       http = Net::HTTP::Proxy(proxy_host, proxy_port).start(@vhost)
       path='/verify'
       data = "privatekey=#{CGI.escape(@privkey)}&remoteip=#{CGI.escape(remoteip)}&challenge=#{CGI.escape(challenge)}&response=#{CGI.escape(response)}"
-      resp, data = http.post(path, data, {'Content-Type'=>'application/x-www-form-urlencoded'})
-      response = data.split
+      resp = http.post(path, data, {'Content-Type'=>'application/x-www-form-urlencoded'})
+      response = resp.body.split
       result = response[0].chomp
-      @last_error=response[1].chomp
+      @last_error = response[1].chomp
       errors.add(:base, msg) if  result != 'true'
-      result == 'true' 
+
+      result == 'true'
     end
   end
 
