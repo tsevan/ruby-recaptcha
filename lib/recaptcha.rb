@@ -183,7 +183,7 @@ module ReCaptcha
     # [response] reCaptcha response
     # [errors] errors hash-likethingy (usually from ActiveRecord::Base.errors)
     def validate(remoteip, challenge, response, errors)
-      msg = "Captcha failed."
+      msg = ReCaptcha::Config.fail_message || "Captcha failed."
       unless response and challenge
         errors.add(:base, msg)
         return false
@@ -191,7 +191,7 @@ module ReCaptcha
       proxy_host, proxy_port = nil, nil
       proxy_host, proxy_port = ENV['proxy_host'].split(':')  if ENV.has_key?('proxy_host')
       http = Net::HTTP::Proxy(proxy_host, proxy_port).start(@vhost)
-      path='/verify'
+      path = '/verify'
       data = "privatekey=#{CGI.escape(@privkey)}&remoteip=#{CGI.escape(remoteip)}&challenge=#{CGI.escape(challenge)}&response=#{CGI.escape(response)}"
       resp = http.post(path, data, {'Content-Type'=>'application/x-www-form-urlencoded'})
       response = resp.body.split
