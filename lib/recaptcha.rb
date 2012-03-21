@@ -205,7 +205,7 @@ module ReCaptcha
 
   module Config
     class << self
-      attr_accessor :rcc_pub, :rcc_priv, :mh_pub, :mh_priv, :enabled
+      attr_accessor :rcc_pub, :rcc_priv, :mh_pub, :mh_priv, :enabled, :fail_message
 
       def config(config_hash)
         config_hash.each do |key, val|
